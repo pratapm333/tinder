@@ -1,0 +1,19 @@
+{
+  "name": "lovetinder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": { 
+    "start": "node src/app.js",
+   "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "NodeJS",
+    "JS"
+  ],
+  "author": "Pratap M",
+  "license": "ISC",
+  "description": "Tinder for love",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
