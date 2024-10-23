@@ -1,33 +1,38 @@
 const express = require("express");
+const connectDB = require("./config/database")
+const User = require("./models/user")
 const app = express();
 
+app.post("/signup", async(req, res)=>{
+    const userObj = {
+        firstName: "Uma",
+        lastName: "Pratap",
+        emailId: "uma@gmail.com",
+        password:"uma123",
+        gender: "Female"
+    }
+
+    try{ 
+        const user = new User(userObj);
+        await user.save();    
+        res.send("User created sucessfully");
+    } catch(err){
+        res.status(400).send("Error saving the user"+ err.message);
+     }   
+   
+})
  
-app.get("/user", (req,res)=>{
-    res.send({"first_name": "Pratap", "last_name": "MP"})
+connectDB()
+.then(() =>{
+    console.log("DB Connection is established")
+    app.listen(3000, () =>{
+        console.log("Server is successfully listen")
+    });
+})
+.catch((err)=>{
+    console.log("DB can't established")
 })
 
-app.post("/user", async (req,res)=>{
-   console.log(req.body)  
-   //saving data in DB
-    res.send("data is created in DB");
-})
-
-app.patch("/user", (req,res)=>{
-    res.send("Updated successfully")
-})
-app.delete("/user", (req,res)=>{
-    res.send("User deleted");
-})
-
-app.use("/hello", (req,res)=>{
-    res.send("Hello hello hello")
-});
 
 
-app.listen(3000, () =>{
-    console.log("Server is successfully listen")
-});
-
-app.use("/", (req,res)=>{
-    res.send("Hi Hello")
-});
+ 

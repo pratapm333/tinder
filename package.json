@@ -2,9 +2,9 @@
   "name": "lovetinder",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": { 
+  "scripts": {
     "start": "node src/app.js",
-   "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js"
   },
   "keywords": [
     "NodeJS",
@@ -14,6 +14,7 @@
   "license": "ISC",
   "description": "Tinder for love",
   "dependencies": {
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongoose": "^8.7.2"
   }
 }
