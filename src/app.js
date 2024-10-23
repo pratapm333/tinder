@@ -3,17 +3,36 @@ const connectDB = require("./config/database")
 const User = require("./models/user")
 const app = express();
 
-app.post("/signup", async(req, res)=>{
-    const userObj = {
-        firstName: "Uma",
-        lastName: "Pratap",
-        emailId: "uma@gmail.com",
-        password:"uma123",
-        gender: "Female"
+app.use(express.json());
+
+app.get("/user", async (req,res)=>{
+    const userEmail = req.body.emailId;
+   
+  try{ 
+    const users = await User.find({emailId:userEmail})
+    if(users.length === 0){
+        res.status(400).send("User not found");
+    }else{
+        res.send(users)} 
     }
+  
+  catch{(err) =>{
+    res.status(400).send("something went wrong")
+  }
+  }
+})
+
+app.post("/signup", async(req, res)=>{
+    // const userObj = {
+    //     firstName: "Uma",
+    //     lastName: "Pratap",
+    //     emailId: "uma@gmail.com",
+    //     password:"uma123",
+    //     gender: "Female"
+    // }
 
     try{ 
-        const user = new User(userObj);
+        const user = new User(req.body);
         await user.save();    
         res.send("User created sucessfully");
     } catch(err){
