@@ -1,16 +1,20 @@
 const express = require("express");
 const connectDB = require("./config/database")
-const User = require("./models/user");
-const user = require("./models/user");
-const app = express();
-const {validateSignUpData} = require("./utils/validation");
-const bcrypt = require('bcrypt');
-const cookieParser = require("cookie-parser");
+const app = express(); 
 const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middleware/auth");
+const cookieParser = require("cookie-parser");
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+
+
 // app.get("/user", async (req,res)=>{
 //     const userId = req.body._id;
    
@@ -62,91 +66,6 @@ app.use(cookieParser());
 //     }
 // })
 
-app.post("/signup", async(req, res)=>{
-    // const userObj = {
-    //     firstName: "Uma",
-    //     lastName: "Pratap",
-    //     emailId: "uma@gmail.com",
-    //     password:"uma123",
-    //     gender: "Female"
-    // }
-
-    try{ 
-        validateSignUpData(req);
-        const {firstName, lastName, emailId, password} = req.body;
-
-        //encrypt password
-        const passwordHash = await bcrypt.hash(password, 10);
-         
-        const user = new User({firstName, lastName, emailId, password: passwordHash});
-        await user.save();    
-        res.send("User created sucessfully");
-    } catch(err){
-        res.status(400).send("Error: "+ err.message);
-     }   
-   
-})
- 
-app.post("/login", async(req, res) =>{
-    try{
-        const {emailId, password} = req.body;
-        const user = await User.findOne({emailId: emailId});
-
-        if(!user){
-            throw new Error("Invalid credentials");
-        }
-
-        const isPasswordValid = await user.validatePassword(password);
-        if(isPasswordValid){
-            const token = await user.getJWT();
-            console.log("token", token);
-
-
-            res.cookie("token", token, {expires: new Date(Date.now() + 8 * 3600000), httpOnly: true});
-            res.send("Login Sucessful!!!");
-        }
-        else{
-            throw new Error("Invalid credentials");
-        }
-        
-    }catch(err){
-            res.status(400).send("Error :" +err.message);
-    }
-})
-
-app.get("/profile", userAuth, async (req,res) => {
-
-    try{
-        // const cookies = req.cookies;
-        // const {token} = cookies;
-        // if(!token){
-        //     throw new Error("Invalid token");
-        // }
-
-        // validate my token
-        // const decodedMessage = await jwt.verify(token, "LOVE@Tinder$143")
-        // console.log(decodedMessage);
-        // const {_id} = decodedMessage;
-        // console.log("LoggedIn user" + _id);
-        // const user = await User.findById(_id);
-        // if(!user){
-        //     throw new Error("User doesn't exist")
-        // }
-        const user = req.user; 
-      
-        res.send(user);
-    }catch(err){
-        res.status(400).send("Error: " + err.message)
-    }
-    
-})
-
-app.post("/sendConnectionRequest", userAuth, async (req,res) => {
-    const user = req.user;
-    console.log("Sending connection request")
-    
-    res.send(user.firstName + " Sent Connection request")
-})
 connectDB()
 .then(() =>{
     console.log("DB Connection is established")
@@ -157,7 +76,3 @@ connectDB()
 .catch((err)=>{
     console.log("DB can't established")
 })
-
-
-
- 
