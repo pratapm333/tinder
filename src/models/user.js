@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 4,
-        maxLength: 50
-
+        maxLength: 50, 
+        index: true,
     },
     lastName: {type:String},
     emailId: {
@@ -74,6 +74,8 @@ userSchema.methods.getJWT = async function(){
     const token = await jwt.sign({_id:user._id}, "LOVE@Tinder$143", { expiresIn: '8d' });
     return token;
 }
+ 
+userSchema.index({ firstName: 1, lastName: 1});
 
 userSchema.methods.validatePassword = async function(passwordInputByUser){
     const user = this;
