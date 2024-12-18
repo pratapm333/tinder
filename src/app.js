@@ -1,20 +1,31 @@
 const express = require("express");
 const connectDB = require("./config/database")
-const app = express(); 
-const jwt = require("jsonwebtoken");
+const app = express();  
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
+
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
-const userRouter = require("./routes/user");
+const userRouter = require("./routes/user"); 
+
+app.use(
+    cors({
+      origin: "http://localhost:5173/", // Your frontend  URL
+      credentials: true, // Required to allow sending cookies
+    })
+  );
 
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser());  
 
+
+ 
 app.use("/", authRouter);
-app.use("/", profileRouter);
-app.use("/", requestRouter);
-app.use("/", userRouter);
+app.use("/profile", profileRouter);
+app.use("/request", requestRouter);
+app.use("/user", userRouter);
+
 
 // app.get("/user", async (req,res)=>{
 //     const userId = req.body._id;
@@ -70,10 +81,11 @@ app.use("/", userRouter);
 connectDB()
 .then(() =>{
     console.log("DB Connection is established")
-    app.listen(3000, () =>{
+    app.listen(8080, () =>{
         console.log("Server is successfully listen")
     });
 })
 .catch((err)=>{
     console.log("DB can't established")
 })
+ 
