@@ -1,87 +1,45 @@
 const express = require("express");
-const connectDB = require("./config/database")
+const connectDB = require("./config/database");
+const cors = require('cors');
 const app = express();  
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
+ 
+
+
+const corsOptions = {
+  origin: 'http://localhost:5173', // Explicitly allow your frontend's origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Include PATCH here
+  allowedHeaders: ['Content-Type', 'Authorization'], // Include necessary headers
+  credentials: true, // Allow credentials
+};
+app.use(cors(corsOptions));
+// Handle preflight requests explicitly for all routes
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
+
+
+app.use(express.json());
+app.use(cookieParser());  
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user"); 
-
-app.use(
-    cors({
-      origin: "http://localhost:5173/", // Your frontend  URL
-      credentials: true, // Required to allow sending cookies
-    })
-  );
-
-app.use(express.json());
-app.use(cookieParser());  
-
-
  
 app.use("/", authRouter);
-app.use("/profile", profileRouter);
+app.use("/", profileRouter);
 app.use("/request", requestRouter);
 app.use("/user", userRouter);
-
-
-// app.get("/user", async (req,res)=>{
-//     const userId = req.body._id;
-   
-//   try{ 
-//     const users = await User.findById(userId);
-//     res.send(users)} 
-  
-//   catch(err){
-//     res.status(400).send("something went wrong")
-//   }
-  
-// })
-
-// app.patch("/user/:userId", async (req,res)=>{
-//     const userId = req.params?.userId;
-//     const data = req.body;
-
-// try{
-//     const ALLOWED_UPDATES = ["photoUrl", "about", "gender","age", "skills"];
-//     const isUpdateAllowed = Object.keys(data).every((k)=>
-//     ALLOWED_UPDATES.includes(k));
-//     if(!isUpdateAllowed){
-//         throw new Error("Update is not allowed");
-//     }
-//     if(data?.skills.length >10){
-//         throw new Error("Not more than 10");
-//     }
-
-//     await User.findByIdAndUpdate({_id:userId},data, {
-//         returnDocument: "after", 
-//         runValidators: true
-//     });
-//     res.send("Updated sucessful")
-// }
-// catch(err){
-//     res.status(400).send("something went wrong")
-//   }
  
-// })
-
-// app.delete("/user", async(req,res) =>{
-//     const userId = req.body.userId;
-//     try{
-//         const user = await User.findByIdAndDelete(userId);
-//         res.send("user Deleted Sucessfull")
-//     }
-//     catch(err){
-//         res.status(400).send("UNABLE TO DELETE")
-//     }
-// })
-
 connectDB()
 .then(() =>{
     console.log("DB Connection is established")
-    app.listen(8080, () =>{
+    app.listen(3000, () =>{
         console.log("Server is successfully listen")
     });
 })
